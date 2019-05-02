@@ -18,6 +18,7 @@ public:
 	static void Send(MessagePtr message);
 	static void Push(MessagePtr message);
 	static void OnDispatch();
+	static void Release();
 private:
 	static std::list<MessagePtr>& _GetActiveQueue();
 	static std::list<MessagePtr>& _GetIdleQueue();

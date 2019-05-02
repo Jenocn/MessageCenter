@@ -43,6 +43,17 @@ void MessageCenter::OnDispatch()
 	_GetActiveQueue().clear();
 }
 
+void MessageCenter::Release()
+{
+	for (auto& pair : _listenerMap)
+	{
+		delete pair.second;
+	}
+	_listenerMap.clear();
+	_GetActiveQueue().clear();
+	_GetIdleQueue().clear();
+}
+
 std::list<MessagePtr>& MessageCenter::_GetActiveQueue()
 {
 	return _messageQueue[_activeQueueSign];

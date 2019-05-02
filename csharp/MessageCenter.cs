@@ -55,4 +55,10 @@ public static class MessageCenter {
 		}
 		_messageQueue[_activeQueueSign].Clear();
 	}
+
+	public static void Release() {
+		_listenerDict.Clear();
+		_messageQueue[true].Clear();
+		_messageQueue[false].Clear();
+	}
 }
