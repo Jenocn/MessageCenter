@@ -43,7 +43,7 @@ void MessageCenter::OnDispatch()
 	_GetActiveQueue().clear();
 }
 
-void MessageCenter::Release()
+void MessageCenter::Clear()
 {
 	for (auto& pair : _listenerMap)
 	{
