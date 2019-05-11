@@ -16,19 +16,20 @@ public static class MessageCenter {
 		_messageQueue[false] = new LinkedList<IMessage>();
 	}
 
-	public static void AddListener<T>(string name, System.Action<T> func) where T : MessageBase<T> {
-		if (string.IsNullOrEmpty(name) || func == null) {
+	public static void AddListener<T>(object obj, System.Action<T> func) where T : MessageBase<T> {
+		if (func == null) {
 			return;
 		}
-		if (_listenerDict.ContainsKey(name)) {
+		var key = _GetKey<T>(obj);
+		if (_listenerDict.ContainsKey(key)) {
 			return;
 		}
 		var listener = new MessageListener<T>(func);
-		_listenerDict.Add(name, listener);
+		_listenerDict.Add(key, listener);
 	}
 
-	public static void RemoveListener(string name) {
-		_listenerDict.Remove(name);
+	public static void RemoveListener<T>(object obj) where T : MessageBase<T> {
+		_listenerDict.Remove(_GetKey<T>(obj));
 	}
 
 	public static void Send(IMessage message) {
@@ -60,5 +61,9 @@ public static class MessageCenter {
 		_listenerDict.Clear();
 		_messageQueue[true].Clear();
 		_messageQueue[false].Clear();
+	}
+
+	private static string _GetKey<T>(object obj) where T : MessageBase<T> {
+		return typeof(T).ToString() + ":" + obj.GetHashCode();
 	}
 }
