@@ -1,7 +1,6 @@
 ﻿/*
-	Author: Jenocn
-	Date: 2019-4-23
-	Email:54467371@qq.com
+	By Jenocn
+	https://jenocn.github.io/
 */
 
 #ifndef __CLASS_TYPE_H_H__

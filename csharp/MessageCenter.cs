@@ -1,69 +1,53 @@
-﻿/*
-	Author: Jenocn
-	Date: 2019-4-26
-	Email:54467371@qq.com
+/*
+	By Jenocn
+	https://jenocn.github.io/
 */
 
-using System.Collections.Generic;
-
+/// <summary>
+/// 消息中心,一个全局消息派发器
+/// </summary>
 public static class MessageCenter {
-	private static Dictionary<string, IMessageListener> _listenerDict = new Dictionary<string, IMessageListener>();
-	private static Dictionary<bool, LinkedList<IMessage>> _messageQueue = new Dictionary<bool, LinkedList<IMessage>>();
-	private static bool _activeQueueSign = false;
+	private static MessageDispatcher _messageDispatcher = new MessageDispatcher();
 
-	static MessageCenter() {
-		_messageQueue[true] = new LinkedList<IMessage>();
-		_messageQueue[false] = new LinkedList<IMessage>();
-	}
-
+	/// <summary>
+	/// 添加消息监听者
+	/// </summary>
 	public static void AddListener<T>(object obj, System.Action<T> func) where T : MessageBase<T> {
-		if (func == null) {
-			return;
-		}
-		var key = _GetKey<T>(obj);
-		if (_listenerDict.ContainsKey(key)) {
-			return;
-		}
-		var listener = new MessageListener<T>(func);
-		_listenerDict.Add(key, listener);
+		_messageDispatcher.AddListener(obj, func);
 	}
 
+	/// <summary>
+	/// 删除监听者
+	/// </summary>
 	public static void RemoveListener<T>(object obj) where T : MessageBase<T> {
-		_listenerDict.Remove(_GetKey<T>(obj));
+		_messageDispatcher.RemoveListener<T>(obj);
 	}
 
+	/// <summary>
+	/// 立即发送消息
+	/// </summary>
 	public static void Send(IMessage message) {
-		if (message == null) { return; }
-		var messageID = message.GetMessageID();
-		foreach (var item in _listenerDict) {
-			if (item.Value.GetMessageID() == messageID) {
-				item.Value.Invoke(message);
-			}
-		}
+		_messageDispatcher.Send(message);
 	}
 
+	/// <summary>
+	/// 入队消息,待OnDispathch时发送
+	/// </summary>
 	public static void Push(IMessage message) {
-		if (message == null) {
-			return;
-		}
-		_messageQueue[!_activeQueueSign].AddLast(message);
+		_messageDispatcher.Push(message);
 	}
 
+	/// <summary>
+	/// 派发队列中的消息
+	/// </summary>
 	public static void OnDispatch() {
-		_activeQueueSign = !_activeQueueSign;
-		foreach (var message in _messageQueue[_activeQueueSign]) {
-			Send(message);
-		}
-		_messageQueue[_activeQueueSign].Clear();
+		_messageDispatcher.OnDispatch();
 	}
 
+	/// <summary>
+	/// 清空消息和监听者
+	/// </summary>
 	public static void Clear() {
-		_listenerDict.Clear();
-		_messageQueue[true].Clear();
-		_messageQueue[false].Clear();
-	}
-
-	private static string _GetKey<T>(object obj) where T : MessageBase<T> {
-		return typeof(T).ToString() + ":" + obj.GetHashCode();
+		_messageDispatcher.Clear();
 	}
 }

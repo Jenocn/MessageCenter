@@ -1,13 +1,13 @@
-﻿/*
-	Author: Jenocn
-	Date: 2019-4-23
-	Email:54467371@qq.com
+/*
+	By Jenocn
+	https://jenocn.github.io/
 */
 
 #ifndef __MESSAGE_CENTER_H_H__
 #define __MESSAGE_CENTER_H_H__
 
 #include "MessageListener.h"
+#include "MessageDispatcher.h"
 
 class MessageCenter
 {
@@ -20,22 +20,13 @@ public:
 	static void OnDispatch();
 	static void Clear();
 private:
-	static std::list<MessagePtr>& _GetActiveQueue();
-	static std::list<MessagePtr>& _GetIdleQueue();
-private:
-	static std::map<std::string, IMessageListener*> _listenerMap;
-	static std::map<bool, std::list<MessagePtr>> _messageQueue;
-	static bool _activeQueueSign;
+    static MessageDispatcher* _messageDispatcher;
 };
 
 template<typename T>
 void MessageCenter::AddListener(const std::string& name, std::function<void(std::shared_ptr<T> message)> func)
 {
-	if (name.empty()) { return; }
-	if (func == nullptr) { return; }
-	if (_listenerMap.find(name) != _listenerMap.end()) { return; }
-	auto listener = new MessageListener<T>(func);
-	_listenerMap.emplace(name, listener);
+	_messageDispatcher->AddListener<T>(name, func);
 }
 
 #endif // !__MESSAGE_CENTER_H_H__
