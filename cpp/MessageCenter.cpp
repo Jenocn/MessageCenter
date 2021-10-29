@@ -8,11 +8,6 @@
 
 MessageDispatcher* MessageCenter::_messageDispatcher = new MessageDispatcher();
 
-void MessageCenter::RemoveListener(const std::string& name)
-{
-	_messageDispatcher->RemoveListener(name);
-}
-
 void MessageCenter::Send(MessagePtr message)
 {
 	_messageDispatcher->Send(message);

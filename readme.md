@@ -40,5 +40,5 @@ MessageCenter::AddListener<YourMessage>("yourListener", [](std::shared_ptr<YourM
 	msg->param;
 });
 // 删除监听
-MessageCenter::RemoveListener("youListener");
+MessageCenter::RemoveListener<YourMessage>("youListener");
 ```

@@ -5,62 +5,93 @@
 
 #include "MessageDispatcher.h"
 
-void MessageDispatcher::RemoveListener(const std::string& name)
-{
-	auto ite = _listenerMap.find(name);
-	if (ite == _listenerMap.end()) { return; }
-	delete ite->second;
-	_listenerMap.erase(ite);
-}
-
-void MessageDispatcher::Send(MessagePtr message)
-{
-	if (!message) { return; }
+void MessageDispatcher::Send(MessagePtr message) {
+	if (!message) {
+		return;
+	}
 	int messageID = message->GetMessageID();
-	for (auto& pair : _listenerMap)
-	{
-		auto listener = pair.second;
-		if (listener->GetMessageID() == messageID)
-		{
-			listener->Invoke(message);
-		}
+
+	_SafeLock();
+	for (auto& pair : _listenerMap[messageID]) {
+		pair.second->Invoke(message);
+	}
+	_SafeUnlock();
+
+	if (!IsSafeLocked()) {
+		_ExecuteSafeQueue();
 	}
 }
 
-void MessageDispatcher::Push(MessagePtr message)
-{
-	if (!message) { return; }
+void MessageDispatcher::Push(MessagePtr message) {
+	if (!message) {
+		return;
+	}
 	_GetIdleQueue().emplace_back(message);
 }
 
-void MessageDispatcher::OnDispatch()
-{
+void MessageDispatcher::OnDispatch() {
 	_activeQueueSign = !_activeQueueSign;
 
-	for (auto message : _GetActiveQueue())
-	{
+	for (auto message : _GetActiveQueue()) {
 		Send(message);
 	}
 	_GetActiveQueue().clear();
 }
 
-void MessageDispatcher::Clear()
-{
-	for (auto& pair : _listenerMap)
-	{
-		delete pair.second;
+void MessageDispatcher::Clear() {
+	for (auto& pair : _listenerMap) {
+		for (auto& kv : pair.second) {
+			delete kv.second;
+		}
 	}
 	_listenerMap.clear();
 	_GetActiveQueue().clear();
 	_GetIdleQueue().clear();
 }
 
-std::list<MessagePtr>& MessageDispatcher::_GetActiveQueue()
-{
+bool MessageDispatcher::IsSafeLocked() const {
+	return _lockCount > 0;
+}
+
+std::list<MessagePtr>& MessageDispatcher::_GetActiveQueue() {
 	return _messageQueue[_activeQueueSign];
 }
 
-std::list<MessagePtr>& MessageDispatcher::_GetIdleQueue()
-{
+std::list<MessagePtr>& MessageDispatcher::_GetIdleQueue() {
 	return _messageQueue[!_activeQueueSign];
+}
+
+void MessageDispatcher::_SafeLock() {
+	++_lockCount;
+}
+
+void MessageDispatcher::_SafeUnlock() {
+	--_lockCount;
+}
+
+void MessageDispatcher::_ExecuteSafeQueue() {
+	auto ite = _safeListenerQueue.begin();
+	while (ite != _safeListenerQueue.end()) {
+		const auto& data = (*ite);
+		auto bAdd = std::get<0>(data);
+		auto messageType = std::get<1>(data);
+		const auto& sender = std::get<2>(data);
+		auto& tempMap = _listenerMap[messageType];
+		if (bAdd) {
+			auto listener = std::get<3>(data);
+			if (tempMap.find(sender) == tempMap.end()) {
+				tempMap.emplace(sender, listener);
+			} else {
+				delete listener;
+			}
+		} else {
+			auto rmIte = tempMap.find(sender);
+			if (rmIte != tempMap.end()) {
+				delete rmIte->second;
+				tempMap.erase(rmIte);
+			}
+		}
+		++ite;
+	}
+	_safeListenerQueue.clear();
 }
