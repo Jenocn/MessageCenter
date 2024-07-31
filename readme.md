@@ -1,6 +1,4 @@
-使用方法,只需要关心两个类
-MessageCenter用于发消息和添加监听者
-MessageBase作为基类让你的消息继承它
+# 使用方法
 
 ```C++
 // 包含头文件
@@ -11,8 +9,9 @@ MessageBase作为基类让你的消息继承它
 class YourMessage : public MessageBase<YourMessage>
 {
 public:
-	// some parameters
+	// 一些参数
 	std::string param;
+	// ...
 };
 ```
 
@@ -30,15 +29,25 @@ MessageCenter::Send(msg);
 ```C++
 // 或者入队
 MessageCenter::Push(msg);
-// 等待OnDispatch派发
-MessageCenter::OnDispatch();
+// 调用Dispatch派发
+MessageCenter::Dispatch();
 ```
 ```C++
 // 添加监听
-MessageCenter::AddListener<YourMessage>("yourListener", [](std::shared_ptr<YourMessage> msg){
-	// use msg;
+MessageCenter::AddListener<YourMessage>(this, [](std::shared_ptr<YourMessage> msg){
+	// 使用参数
 	msg->param;
 });
 // 删除监听
-MessageCenter::RemoveListener<YourMessage>("youListener");
+MessageCenter::RemoveListener<YourMessage>(this);
+```
+
+```C++
+// 使用自定义的消息派发器
+// 方法和MessageCenter相同
+MessageDispatcher dispather;
+dispather.AddListener<YourMessage>(....);
+dispather.Send(....);
+dispather.RemoveListener<YourMessage>(....);
+// ......
 ```
