@@ -14,8 +14,6 @@ public:
 	template<typename _Ty>
 	static void RemoveListener(const void* sender);
 	static void Send(std::shared_ptr<IMessage> message);
-	static void Push(std::shared_ptr<IMessage> message);
-	static void Dispatch();
 	static void Clear();
 private:
 	static MessageDispatcher _messageDispatcher;

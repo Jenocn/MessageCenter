@@ -10,20 +10,20 @@
 class IMessage {
 public:
     virtual ~IMessage() = default;
-    virtual int GetMessageId() const = 0;
+    virtual std::size_t GetMessageId() const = 0;
 };
 
 template <typename _Ty>
 class MessageBase : public IMessage {
 public:
     virtual ~MessageBase() = default;
-    virtual int GetMessageId() const;
+    virtual std::size_t GetMessageId() const;
 
     static std::shared_ptr<_Ty> Create();
 };
 
 template <typename _Ty>
-int MessageBase<_Ty>::GetMessageId() const {
+std::size_t MessageBase<_Ty>::GetMessageId() const {
     return MessageTypeId<_Ty>::id.index;
 }
 
