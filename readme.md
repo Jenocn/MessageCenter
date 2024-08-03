@@ -18,25 +18,19 @@ public:
 ```C++
 // 创建消息
 auto msg = YourMessage::Create();
+msg->param = "some";
 ```
 
 ```C++
-// msg->param = "some";
-// 发送立即生效
+// 发送消息
 MessageCenter::Send(msg);
 ```
 
 ```C++
-// 或者入队
-MessageCenter::Push(msg);
-// 调用Dispatch派发
-MessageCenter::Dispatch();
-```
-```C++
 // 添加监听
-MessageCenter::AddListener<YourMessage>(this, [](std::shared_ptr<YourMessage> msg){
+MessageCenter::AddListener<YourMessage>(this, [](const YourMessage* msg){
 	// 使用参数
-	msg->param;
+	std::cout << msg->param << std::endl;
 });
 // 删除监听
 MessageCenter::RemoveListener<YourMessage>(this);

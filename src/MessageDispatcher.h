@@ -10,7 +10,7 @@
 class MessageDispatcher {
 public:
 	template<typename _Ty>
-	void AddListener(const void* sender, std::function<void(std::shared_ptr<_Ty>)> func);
+	void AddListener(const void* sender, std::function<void(const _Ty*)> func);
 	template<typename _Ty>
 	void RemoveListener(const void* sender);
 	void Send(std::shared_ptr<IMessage> message);
@@ -25,7 +25,7 @@ private:
 };
 
 template<typename _Ty>
-void MessageDispatcher::AddListener(const void* sender, std::function<void(std::shared_ptr<_Ty>)> func) {
+void MessageDispatcher::AddListener(const void* sender, std::function<void(const _Ty*)> func) {
 	if (!sender) {
 		std::cerr << "[Error] MessageDispatcher::AddListener: Sender is null!" << std::endl;
 		return;

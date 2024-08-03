@@ -10,7 +10,7 @@
 class MessageCenter {
 public:
 	template<typename _Ty>
-	static void AddListener(const void* sender, std::function<void(std::shared_ptr<_Ty>)> func);
+	static void AddListener(const void* sender, std::function<void(const _Ty*)> func);
 	template<typename _Ty>
 	static void RemoveListener(const void* sender);
 	static void Send(std::shared_ptr<IMessage> message);
@@ -20,7 +20,7 @@ private:
 };
 
 template<typename _Ty>
-void MessageCenter::AddListener(const void* sender, std::function<void(std::shared_ptr<_Ty>)> func) {
+void MessageCenter::AddListener(const void* sender, std::function<void(const _Ty*)> func) {
 	_messageDispatcher.AddListener<_Ty>(sender, func);
 }
 
