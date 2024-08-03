@@ -16,11 +16,11 @@ public:
 	void Send(std::shared_ptr<IMessage> message);
 	void Clear();
 private:
-	void _AddListener(std::size_t messageId, std::size_t senderKey, IMessageListener* listener);
-	void _RemoveListener(std::size_t messageId, std::size_t senderKey);
+	void _AddListener(std::size_t messageId, std::uintptr_t senderKey, IMessageListener* listener);
+	void _RemoveListener(std::size_t messageId, std::uintptr_t senderKey);
 private:
 	std::unordered_map<std::size_t, std::unordered_map<std::uintptr_t, IMessageListener*>> _listenerMap;
-	std::list<std::tuple<std::size_t, std::size_t, IMessageListener*>> _listenerCacheQueue;
+	std::list<std::tuple<std::size_t, std::uintptr_t, IMessageListener*>> _listenerCacheQueue;
 	std::unordered_set<std::size_t> _messageInvokePool;
 };
 
@@ -35,9 +35,9 @@ void MessageDispatcher::AddListener(const void* sender, std::function<void(const
 		return;
 	}
 	auto messageId = MessageTypeId<_Ty>::id.index;
-	auto senderKey = static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(sender));
+	auto senderKey = reinterpret_cast<std::uintptr_t>(sender);
 	if (!_messageInvokePool.empty()) {
-		_listenerCacheQueue.emplace_back(std::tuple<std::size_t, std::size_t, IMessageListener*>(
+		_listenerCacheQueue.emplace_back(std::tuple<std::size_t, std::uintptr_t, IMessageListener*>(
 			messageId, senderKey, new MessageListener<_Ty>(func)));
 		return;
 	}
@@ -47,8 +47,7 @@ void MessageDispatcher::AddListener(const void* sender, std::function<void(const
 		std::cerr << "[Error] MessageDispatcher::AddListener: sender is exist!" << std::endl;
 		return;
 	}
-	auto listener = new MessageListener<_Ty>(func);
-	lisMap.emplace(senderKey, listener);
+	lisMap.emplace(senderKey, new MessageListener<_Ty>(func));
 }
 
 template<typename _Ty>
@@ -58,10 +57,10 @@ void MessageDispatcher::RemoveListener(const void* sender) {
 		return;
 	}
 	auto messageId = MessageTypeId<_Ty>::id.index;
-	auto senderKey = static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(sender));
+	auto senderKey = reinterpret_cast<std::uintptr_t>(sender);
 
 	if (!_messageInvokePool.empty()) {
-		_listenerCacheQueue.emplace_back(std::tuple<std::size_t, std::size_t, IMessageListener*>(
+		_listenerCacheQueue.emplace_back(std::tuple<std::size_t, std::uintptr_t, IMessageListener*>(
 			messageId, senderKey, nullptr));
 		return;
 	}

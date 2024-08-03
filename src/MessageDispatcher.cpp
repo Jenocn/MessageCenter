@@ -56,7 +56,7 @@ void MessageDispatcher::Clear() {
 	_listenerMap.clear();
 }
 
-void MessageDispatcher::_AddListener(std::size_t messageId, std::size_t senderKey, IMessageListener* listener) {
+void MessageDispatcher::_AddListener(std::size_t messageId, std::uintptr_t senderKey, IMessageListener* listener) {
 	auto& tmpMap = _listenerMap[messageId];
 	auto ite = tmpMap.find(senderKey);
 	if (ite != tmpMap.end()) {
@@ -66,7 +66,7 @@ void MessageDispatcher::_AddListener(std::size_t messageId, std::size_t senderKe
 	}
 	tmpMap.emplace(senderKey, listener);
 }
-void MessageDispatcher::_RemoveListener(std::size_t messageId, std::size_t senderKey) {
+void MessageDispatcher::_RemoveListener(std::size_t messageId, std::uintptr_t senderKey) {
 	auto ite = _listenerMap.find(messageId);
 	if (ite == _listenerMap.end()) {
 		return;
