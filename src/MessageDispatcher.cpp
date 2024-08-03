@@ -7,7 +7,7 @@
 
 void MessageDispatcher::Send(std::shared_ptr<IMessage> message) {
 	if (!message) {
-		assert(!"MessageDispatcher::Send: Message is null!");
+		std::cerr << "[Error] MessageDispatcher::Send: Message is null!" << std::endl;
 		return;
 	}
 
@@ -18,7 +18,7 @@ void MessageDispatcher::Send(std::shared_ptr<IMessage> message) {
 	}
 
 	if (_messageInvokePool.find(messageId) != _messageInvokePool.end()) {
-		assert(!("MessageDispatcher::Send: Message is recursive send! -> " + std::string(typeid(*message).name())).c_str());
+		std::cerr << "[Error] MessageDispatcher::Send: Message is recursive send! -> " << typeid(*message).name() << std::endl;
 		return;
 	}
 
@@ -45,7 +45,7 @@ void MessageDispatcher::Send(std::shared_ptr<IMessage> message) {
 
 void MessageDispatcher::Clear() {
 	if (!_messageInvokePool.empty()) {
-		assert(!"MessageDispatcher::Clear: Cannot perform this operation while processing the message.");
+		std::cerr << "[Error] MessageDispatcher::Clear: Cannot perform this operation while processing the message." << std::endl;
 		return;
 	}
 	for (auto& pair : _listenerMap) {
@@ -61,7 +61,7 @@ void MessageDispatcher::_AddListener(std::size_t messageId, std::size_t senderKe
 	auto ite = tmpMap.find(senderKey);
 	if (ite != tmpMap.end()) {
 		delete listener;
-		assert(!"MessageDispatcher::AddListener: The sender is exist!");
+		std::cerr << "[Error] MessageDispatcher::AddListener: The sender is exist!" << std::endl;
 		return;
 	}
 	tmpMap.emplace(senderKey, listener);

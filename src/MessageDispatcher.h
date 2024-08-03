@@ -27,11 +27,11 @@ private:
 template<typename _Ty>
 void MessageDispatcher::AddListener(const void* sender, std::function<void(std::shared_ptr<_Ty>)> func) {
 	if (!sender) {
-		assert(!"MessageDispatcher::AddListener: Sender is null!");
+		std::cerr << "[Error] MessageDispatcher::AddListener: Sender is null!" << std::endl;
 		return;
 	}
 	if (func == nullptr) {
-		assert(!"MessageDispatcher::AddListener: Func is null!");
+		std::cerr << "[Error] MessageDispatcher::AddListener: Func is null!" << std::endl;
 		return;
 	}
 	auto messageId = MessageTypeId<_Ty>::id.index;
@@ -44,7 +44,7 @@ void MessageDispatcher::AddListener(const void* sender, std::function<void(std::
 
 	auto& lisMap = _listenerMap[messageId];
 	if (lisMap.find(senderKey) != lisMap.end()) {
-		assert(!"MessageDispatcher::AddListener: sender is exist!");
+		std::cerr << "[Error] MessageDispatcher::AddListener: sender is exist!" << std::endl;
 		return;
 	}
 	auto listener = new MessageListener<_Ty>(func);
@@ -54,7 +54,7 @@ void MessageDispatcher::AddListener(const void* sender, std::function<void(std::
 template<typename _Ty>
 void MessageDispatcher::RemoveListener(const void* sender) {
 	if (!sender) {
-		assert(!"MessageDispatcher::RemoveListener: Sender is null!");
+		std::cerr << "[Error] MessageDispatcher::RemoveListener: Sender is null!" << std::endl;
 		return;
 	}
 	auto messageId = MessageTypeId<_Ty>::id.index;
