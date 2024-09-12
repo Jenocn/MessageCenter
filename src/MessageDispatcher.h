@@ -58,7 +58,7 @@ void MessageDispatcher::RemoveListener(const void* sender) {
 		std::cerr << "[Error] MessageDispatcher::RemoveListener: Sender is null!" << std::endl;
 		return;
 	}
-	auto messageId = MessageTypeId<_Ty>::id.index;
+	auto messageId = MessageBase<_Ty>::id;
 	auto senderKey = reinterpret_cast<std::size_t>(sender);
 
 	if (!_messageInvokePool.empty()) {
