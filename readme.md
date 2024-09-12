@@ -3,6 +3,8 @@
 ```C++
 // 包含头文件
 #include "MessageCenter.h"
+// 应用命名空间
+using namespace Message;
 ```
 ```C++
 // 定义消息
