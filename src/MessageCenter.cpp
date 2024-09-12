@@ -5,9 +5,11 @@
 
 #include "MessageCenter.h"
 
-MessageDispatcher MessageCenter::_messageDispatcher; 
+using namespace Message;
 
-void MessageCenter::Send(std::shared_ptr<IMessage> message) {
+MessageDispatcher MessageCenter::_messageDispatcher;
+
+void MessageCenter::Send(const IMessage& message) {
 	_messageDispatcher.Send(message);
 }
 
