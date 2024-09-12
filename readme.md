@@ -17,8 +17,8 @@ public:
 
 ```C++
 // 创建消息
-auto msg = YourMessage::Create();
-msg->param = "some";
+YourMessage msg;
+msg.param = "some";
 ```
 
 ```C++
@@ -28,9 +28,9 @@ MessageCenter::Send(msg);
 
 ```C++
 // 添加监听
-MessageCenter::AddListener<YourMessage>(this, [](const YourMessage* msg){
+MessageCenter::AddListener<YourMessage>(this, [](const YourMessage& msg){
 	// 使用参数
-	std::cout << msg->param << std::endl;
+	std::cout << msg.param << std::endl;
 });
 // 删除监听
 MessageCenter::RemoveListener<YourMessage>(this);
