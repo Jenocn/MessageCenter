@@ -20,6 +20,7 @@ public:
 private:
 	void _AddListener(std::size_t messageId, std::size_t senderKey, std::unique_ptr<IMessageListener> listener);
 	void _RemoveListener(std::size_t messageId, std::size_t senderKey);
+	void _Assert(const char* msgInfo, const char* callInfo, const char* msgName);
 private:
 	std::unordered_map<std::size_t, std::unordered_map<std::size_t, std::unique_ptr<IMessageListener>>> _listenerMap;
 	std::list<std::tuple<std::size_t, std::size_t, std::unique_ptr<IMessageListener>>> _listenerCacheQueue;
@@ -29,24 +30,23 @@ private:
 template<typename _Ty>
 void MessageDispatcher::AddListener(const void* sender, std::function<void(const _Ty&)> func) {
 	if (!sender) {
-		std::cerr << "[Error] MessageDispatcher::AddListener: Sender is null!" << std::endl;
+		_Assert("Sender is null!", "AddListener", typeid(_Ty).name());
 		return;
 	}
-	if (func == nullptr) {
-		std::cerr << "[Error] MessageDispatcher::AddListener: Func is null!" << std::endl;
+	if (!func) {
+		_Assert("Func is null!", "AddListener", typeid(_Ty).name());
 		return;
 	}
 	auto messageId = MessageBase<_Ty>::id;
 	auto senderKey = reinterpret_cast<std::size_t>(sender);
 	if (!_messageInvokePool.empty()) {
-		_listenerCacheQueue.emplace_back(std::tuple<std::size_t, std::size_t, std::unique_ptr<IMessageListener>>(
-			messageId, senderKey, std::make_unique<MessageListener<_Ty>>(func)));
+		_listenerCacheQueue.emplace_back(std::make_tuple(messageId, senderKey, std::make_unique<MessageListener<_Ty>>(func)));
 		return;
 	}
 
 	auto& lisMap = _listenerMap[messageId];
 	if (lisMap.find(senderKey) != lisMap.end()) {
-		std::cerr << "[Error] MessageDispatcher::AddListener: sender is exist!" << std::endl;
+		_Assert("Sender is exist!", "AddListener", typeid(_Ty).name());
 		return;
 	}
 	lisMap.emplace(senderKey, std::make_unique<MessageListener<_Ty>>(func));
@@ -55,15 +55,14 @@ void MessageDispatcher::AddListener(const void* sender, std::function<void(const
 template<typename _Ty>
 void MessageDispatcher::RemoveListener(const void* sender) {
 	if (!sender) {
-		std::cerr << "[Error] MessageDispatcher::RemoveListener: Sender is null!" << std::endl;
+		_Assert("Sender is null!", "AddListener", typeid(_Ty).name());
 		return;
 	}
 	auto messageId = MessageBase<_Ty>::id;
 	auto senderKey = reinterpret_cast<std::size_t>(sender);
 
 	if (!_messageInvokePool.empty()) {
-		_listenerCacheQueue.emplace_back(std::tuple<std::size_t, std::size_t, std::unique_ptr<IMessageListener>>(
-			messageId, senderKey, nullptr));
+		_listenerCacheQueue.emplace_back(std::make_tuple(messageId, senderKey, nullptr));
 		return;
 	}
 

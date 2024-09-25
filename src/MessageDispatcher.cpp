@@ -4,6 +4,8 @@
 */
 
 #include "MessageDispatcher.h"
+#include <cassert>
+#include <iostream>
 
 using namespace Message;
 
@@ -15,7 +17,7 @@ void MessageDispatcher::Send(const IMessage& message) {
 	}
 
 	if (_messageInvokePool.find(messageId) != _messageInvokePool.end()) {
-		std::cerr << "[Error] MessageDispatcher::Send: Message is recursive send! -> " << typeid(message).name() << std::endl;
+		_Assert("Message is recursive send!", "Send", typeid(message).name());
 		return;
 	}
 
@@ -42,7 +44,7 @@ void MessageDispatcher::Send(const IMessage& message) {
 
 void MessageDispatcher::Clear() {
 	if (!_messageInvokePool.empty()) {
-		std::cerr << "[Error] MessageDispatcher::Clear: Cannot perform this operation while processing the message." << std::endl;
+		_Assert("Cannot perform this operation while processing the message.", "Clear", "");
 		return;
 	}
 	_listenerMap.clear();
@@ -52,7 +54,7 @@ void MessageDispatcher::_AddListener(std::size_t messageId, std::size_t senderKe
 	auto& tmpMap = _listenerMap[messageId];
 	auto ite = tmpMap.find(senderKey);
 	if (ite != tmpMap.end()) {
-		std::cerr << "[Error] MessageDispatcher::AddListener: The sender is exist!" << std::endl;
+		_Assert("Sender is exist!", "AddListener", listener->GetMessageTypeName());
 		return;
 	}
 	tmpMap.emplace(senderKey, std::move(listener));
@@ -66,4 +68,11 @@ void MessageDispatcher::_RemoveListener(std::size_t messageId, std::size_t sende
 	if (iteSender != ite->second.end()) {
 		ite->second.erase(iteSender);
 	}
+}
+void MessageDispatcher::_Assert(const char* msgInfo, const char* callInfo, const char* msgName) {
+	std::cerr << "Message Error:" << std::endl;
+	std::cerr << "Info: " << msgInfo << std::endl;
+	std::cerr << "Call: " << callInfo << std::endl;
+	std::cerr << "Name: " << msgName << std::endl;
+	assert(false);
 }
