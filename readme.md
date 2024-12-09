@@ -2,30 +2,27 @@
 
 ```C++
 // 包含头文件
-#include "MessageCenter.h"
+#include "Dispatcher.h"
 // 应用命名空间
 using namespace Message;
 ```
 ```C++
-// 定义消息
-class YourMessage : public MessageBase<YourMessage>
-{
-public:
-	// 一些参数
-	std::string param;
-	// ...
+// 定义任意结构的消息, 并发送
+int int_msg { 10 };
+MessageCenter::Send(int_msg);
+
+//
+std::string str_msg { "hello" };
+MessageCenter::Send(str_msg);
+
+//
+struct Custom {
+	int value;
 };
-```
+Custom custom_msg;
+MessageCenter::Send(custom_msg);
 
-```C++
-// 创建消息
-YourMessage msg;
-msg.param = "some";
-```
-
-```C++
-// 发送消息
-MessageCenter::Send(msg);
+// ...
 ```
 
 ```C++
@@ -36,14 +33,4 @@ MessageCenter::AddListener<YourMessage>(this, [](const YourMessage& msg){
 });
 // 删除监听
 MessageCenter::RemoveListener<YourMessage>(this);
-```
-
-```C++
-// 使用自定义的消息派发器
-// 方法和MessageCenter相同
-MessageDispatcher dispather;
-dispather.AddListener<YourMessage>(....);
-dispather.Send(....);
-dispather.RemoveListener<YourMessage>(....);
-// ......
 ```
