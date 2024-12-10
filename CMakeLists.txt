@@ -19,9 +19,4 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
-file(GLOB_RECURSE SOURCES "./src/*.cpp" "./include/*.h")
-add_library(${MESSAGE_CENTER} STATIC ${SOURCES})
-
-add_executable("test" ${SOURCES} "./test/main.cpp")
-
 include_directories("./include")
