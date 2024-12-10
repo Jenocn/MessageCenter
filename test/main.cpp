@@ -1,5 +1,5 @@
 
-#include <Dispatcher.h>
+#include <Message.h>
 #include <iostream>
 
 int main(int, char**) {

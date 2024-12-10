@@ -2,35 +2,34 @@
 
 ```C++
 // 包含头文件
-#include "Dispatcher.h"
-// 应用命名空间
-using namespace Message;
-```
-```C++
-// 定义任意结构的消息, 并发送
-int int_msg { 10 };
-MessageCenter::Send(int_msg);
+#include "Message.h"
 
-//
-std::string str_msg { "hello" };
-MessageCenter::Send(str_msg);
+// 实例化一个派发器
+Message::Dispatcher dispatcher;
 
-//
+// 定义消息
 struct Custom {
 	int value;
 };
-Custom custom_msg;
-MessageCenter::Send(custom_msg);
 
-// ...
-```
-
-```C++
 // 添加监听
-MessageCenter::AddListener<YourMessage>(this, [](const YourMessage& msg){
+dispatcher.AddListener<Custom>(this, [](const int& msg){
 	// 使用参数
 	std::cout << msg.param << std::endl;
 });
 // 删除监听
-MessageCenter::RemoveListener<YourMessage>(this);
+dispatcher.RemoveListener<Custom>(this);
+
+// 发送消息
+Custom custom_msg;
+dispatcher.Send(custom_msg);
+```
+
+```C++
+// 支持任意结构的消息
+int int_msg { 10 };
+dispatcher.Send(int_msg);
+
+std::string str_msg { "hello" };
+dispatcher.Send(str_msg);
 ```

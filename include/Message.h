@@ -56,7 +56,7 @@ private:
 	};
 
 public:
-	// AddListener
+	//
 	template<typename _Ty>
 	void AddListener(const void* sender, std::function<void(const _Ty&)> func) {
 		if (!sender) {
@@ -82,7 +82,7 @@ public:
 		lis_map.emplace(sender_key, std::make_unique<Listener<_Ty>>(func));
 	}
 
-	// RemoveListener
+	//
 	template<typename _Ty>
 	void RemoveListener(const void* sender) {
 		if (!sender) {
@@ -100,7 +100,7 @@ public:
 		_listener_map[message_code].erase(sender_key);
 	}
 
-	// Send
+	//
 	template <typename _Ty>
 	void Send(const _Ty& message) {
 		std::size_t message_code { Type<_Ty>::TYPE_CODE };
@@ -139,7 +139,7 @@ public:
 		_listener_cache_queue.clear();
 	}
 
-	// Clear
+	//
 	void Clear() {
 		if (!_message_invoke_pool.empty()) {
 			MESSAGE_ASSERT("Cannot perform this operation while processing the message.", "Clear", "");
